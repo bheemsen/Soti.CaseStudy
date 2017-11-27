@@ -1,0 +1,90 @@
+<%@ Application Language="C#" %>
+
+<script runat="server">
+
+    mainclass obj = new mainclass();
+    void Application_Start(object sender, EventArgs e) 
+    {
+        System.Web.Routing.RouteTable.Routes.Ignore("{resource}.axd/{*pathInfo}");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page1","Home","~/index.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page2", "signup", "~/Register.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page3", "signup-{email}", "~/Register.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page4", "password-recovery", "~/Forgetpassword.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page5", "MyAccount", "~/MyAccount.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page6", "logout", "~/logout.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page7", "help", "~/Help.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page8", "help-{hcat}", "~/Help.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page9", "help-{hcat}-{htext}", "~/Help.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page10", "membership", "~/Membership.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page11", "content/{spage}", "~/staticpage.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page12", "HelpAns-{HID}", "~/Help-details.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page13", "update-profile", "~/Register-Step2.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page14", "profile/{catname}/{username}/{userid}", "~/profile.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page15", "gallery", "~/gallery.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page16", "gallery/showcase/{GID}", "~/Gallery-Detail.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page17", "contest", "~/contest.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page18", "casting-call", "~/Casting-Call.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page19", "casting-call/{category}", "~/Casting-Call.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page20", "casting-call/{category}/{CountryID}", "~/Casting-Call.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page21", "castingcall/{castingID}", "~/EditCasting-Call.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page22", "search/{category}/{categoryID}", "~/Search.aspx");
+        System.Web.Routing.RouteTable.Routes.MapPageRoute("page23", "search/{category}/{categoryID}/{countryID}", "~/Search.aspx");
+        
+    }
+    
+    void Application_End(object sender, EventArgs e) 
+    {
+        //  Code that runs on application shutdown
+
+    }
+
+    void Application_Error(object sender, EventArgs e)
+    {
+        // At this point we have information about the error
+        HttpContext ctx = HttpContext.Current;
+
+        // set the exception to the Context 
+        Exception exception = ctx.Server.GetLastError();
+
+        // get the status code of the Error
+        int httpCode = ((HttpException)exception).GetHttpCode();
+
+        // get the IP Address
+        String strHostName = string.Empty;
+        String ipAddress_s = string.Empty;
+        strHostName = System.Net.Dns.GetHostName();
+        String mainIp = Request.UserHostAddress.ToString();
+        System.Net.IPHostEntry ipEntry = System.Net.Dns.GetHostByName(strHostName);
+        System.Net.IPAddress[] addr = ipEntry.AddressList;
+
+        for (int i = 0; i < addr.Length; i++)
+        {
+            ipAddress_s += "IP Address {" + (i + 1) + "} " +
+                                addr[i].ToString() + Environment.NewLine;
+        }
+        if(httpCode.ToString()!="")
+        {
+            string sql = "";
+            sql += "insert into Error_Log (errorlocation,errorinfo,errorcode,errortrycatch,locationip,clientsystem,clientip) values (";
+            sql += "'" + ctx.Request.Url.ToString() + "','" + exception.Message.Replace("'", "") + "','" + httpCode.ToString() + "','" + exception.InnerException+"".Replace("'", "") + "',";
+            sql += "'"+ mainIp +"','"+ strHostName +"','"+ addr[0].ToString() +"')";            
+            int i = obj.query(sql);
+        }
+        // setup the error info one for user display and one for the DB Insert    
+    }
+    void Session_Start(object sender, EventArgs e) 
+    {
+        // Code that runs when a new session is started
+
+    }
+
+    void Session_End(object sender, EventArgs e) 
+    {
+        // Code that runs when a session ends. 
+        // Note: The Session_End event is raised only when the sessionstate mode
+        // is set to InProc in the Web.config file. If session mode is set to StateServer 
+        // or SQLServer, the event is not raised.
+
+    }
+       
+</script>
